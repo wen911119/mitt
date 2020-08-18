@@ -1,5 +1,5 @@
 {
-  "name": "mitt",
+  "name": "mitt-block",
   "version": "2.1.0",
   "description": "Tiny 200b functional Event Emitter / pubsub.",
   "jsnext:main": "dist/mitt.es.js",

@@ -1,4 +1,4 @@
-export type EventType = string | symbol;
+export type EventType = string;
 
 // An event handler can take an optional event argument
 // and should not return a value
@@ -10,7 +10,10 @@ export type EventHandlerList = Array<Handler>;
 export type WildCardEventHandlerList = Array<WildcardHandler>;
 
 // A map of event types and their corresponding event handlers.
-export type EventHandlerMap = Map<EventType, EventHandlerList | WildCardEventHandlerList>;
+export type EventHandlerMap = Map<
+	EventType,
+	EventHandlerList | WildCardEventHandlerList | any
+>;
 
 export interface Emitter {
 	all: EventHandlerMap;
@@ -30,9 +33,11 @@ export interface Emitter {
  * @name mitt
  * @returns {Mitt}
  */
-export default function mitt(all?: EventHandlerMap): Emitter {
-	all = all || new Map();
-
+export default function mitt(channel = '___DEFAULT_CHANNEL___'): Emitter {
+	if (!window[channel]) {
+		window[channel] = new Map();
+	}
+	const all: EventHandlerMap = window[channel];
 	return {
 
 		/**
@@ -46,11 +51,15 @@ export default function mitt(all?: EventHandlerMap): Emitter {
 		 * @param {Function} handler Function to call in response to given event
 		 * @memberOf mitt
 		 */
-		on<T = any>(type: EventType, handler: Handler<T>) {
+		on<T = any>(type: EventType, handler: Handler<T>, readCache = true) {
 			const handlers = all.get(type);
 			const added = handlers && handlers.push(handler);
 			if (!added) {
 				all.set(type, [handler]);
+			}
+			const lastValue = all.get(`${type}__CACHE__`);
+			if (readCache && lastValue) {
+				handler(lastValue);
 			}
 		},
 
@@ -78,8 +87,15 @@ export default function mitt(all?: EventHandlerMap): Emitter {
 		 * @memberOf mitt
 		 */
 		emit<T = any>(type: EventType, evt: T) {
-			((all.get(type) || []) as EventHandlerList).slice().map((handler) => { handler(evt); });
-			((all.get('*') || []) as WildCardEventHandlerList).slice().map((handler) => { handler(type, evt); });
+			((all.get(type) || []) as EventHandlerList).slice().map((handler) => {
+				handler(evt);
+			});
+			((all.get('*') || []) as WildCardEventHandlerList)
+				.slice()
+				.map((handler) => {
+					handler(type, evt);
+				});
+			all.set(`${type}__CACHE__`, evt);
 		}
 	};
 }
