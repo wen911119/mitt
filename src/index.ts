@@ -18,7 +18,7 @@ export type EventHandlerMap = Map<
 export interface Emitter {
 	all: EventHandlerMap;
 
-	on<T = any>(type: EventType, handler: Handler<T>): void;
+	on<T = any>(type: EventType, handler: Handler<T>, readCache?: boolean): void;
 	on(type: '*', handler: WildcardHandler): void;
 
 	off<T = any>(type: EventType, handler: Handler<T>): void;
