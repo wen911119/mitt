@@ -60,6 +60,7 @@ export default function mitt(channel = '___DEFAULT_CHANNEL___'): Emitter {
 			const lastValue = all.get(`${type}__CACHE__`);
 			if (readCache && lastValue) {
 				handler(lastValue);
+				all.set(`${type}__CACHE__`, undefined);
 			}
 		},
 
@@ -95,7 +96,10 @@ export default function mitt(channel = '___DEFAULT_CHANNEL___'): Emitter {
 				.map((handler) => {
 					handler(type, evt);
 				});
-			all.set(`${type}__CACHE__`, evt);
+			if (!all.get(type) && !all.get('*')) {
+				// 如果没有命中任何handler，就推进缓存
+				all.set(`${type}__CACHE__`, evt);
+			}
 		}
 	};
 }
