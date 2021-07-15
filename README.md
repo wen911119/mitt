@@ -128,6 +128,7 @@ Register an event handler for the given type.
 
 -   `type` **([string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) \| [symbol](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Symbol))** Type of event to listen for, or `"*"` for all events
 -   `handler` **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)** Function to call in response to given event
+-   `readCache`   (optional, default `true`)
 
 ### off
 

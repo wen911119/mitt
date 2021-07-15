@@ -74,6 +74,10 @@ export default function mitt(channel = '___DEFAULT_CHANNEL___'): Emitter {
 			const handlers = all.get(type);
 			if (handlers) {
 				handlers.splice(handlers.indexOf(handler) >>> 0, 1);
+				// 如果handlers都被取消完了，就把这个频道也置为undefined
+				if (handlers.length === 0) {
+					all.set(type, undefined);
+				}
 			}
 		},
 
