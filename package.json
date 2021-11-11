@@ -1,5 +1,5 @@
 {
-  "name": "mitt",
+  "name": "@ruiyun/mitt",
   "version": "3.0.0",
   "description": "Tiny 200b functional Event Emitter / pubsub.",
   "module": "dist/mitt.mjs",

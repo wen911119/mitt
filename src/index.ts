@@ -31,6 +31,8 @@ export interface Emitter<Events extends Record<EventType, unknown>> {
 	emit<Key extends keyof Events>(type: undefined extends Events[Key] ? Key : never): void;
 }
 
+const moduleSharedEventHandlerMap = new Map();
+
 /**
  * Mitt: Tiny (~200b) functional event emitter / pubsub.
  * @name mitt
@@ -42,7 +44,7 @@ export default function mitt<Events extends Record<EventType, unknown>>(
 	type GenericEventHandler =
 		| Handler<Events[keyof Events]>
 		| WildcardHandler<Events>;
-	all = all || new Map();
+	all = all || moduleSharedEventHandlerMap;
 
 	return {
 
