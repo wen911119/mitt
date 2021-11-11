@@ -1,21 +1,25 @@
 {
-  "name": "mitt-block",
-  "version": "2.1.3",
+  "name": "mitt",
+  "version": "3.0.0",
   "description": "Tiny 200b functional Event Emitter / pubsub.",
-  "jsnext:main": "dist/mitt.es.js",
-  "source": "src/index.ts",
-  "module": "dist/mitt.es.js",
-  "esmodules": "dist/mitt.modern.js",
+  "module": "dist/mitt.mjs",
   "main": "dist/mitt.js",
+  "jsnext:main": "dist/mitt.mjs",
   "umd:main": "dist/mitt.umd.js",
+  "source": "src/index.ts",
   "typings": "index.d.ts",
+  "exports": {
+    "import": "./dist/mitt.mjs",
+    "require": "./dist/mitt.js",
+    "default": "./dist/mitt.mjs"
+  },
   "scripts": {
     "test": "npm-run-all --silent typecheck lint mocha test-types",
     "mocha": "mocha test",
-    "test-types": "tsc test/test-types-compilation.ts --noEmit",
+    "test-types": "tsc test/test-types-compilation.ts --noEmit --strict",
     "lint": "eslint src test --ext ts --ext js",
     "typecheck": "tsc --noEmit",
-    "bundle": "microbundle",
+    "bundle": "microbundle -f es,cjs,umd",
     "build": "npm-run-all --silent clean -p bundle -s docs",
     "clean": "rimraf dist",
     "docs": "documentation readme src/index.ts --section API -q --parse-extension ts",
@@ -34,7 +38,6 @@
   ],
   "license": "MIT",
   "files": [
-    "src",
     "dist",
     "index.d.ts"
   ],
@@ -78,7 +81,8 @@
       "@typescript-eslint/no-explicit-any": 0,
       "@typescript-eslint/explicit-function-return-type": 0,
       "@typescript-eslint/explicit-module-boundary-types": 0,
-      "@typescript-eslint/no-empty-function": 0
+      "@typescript-eslint/no-empty-function": 0,
+      "@typescript-eslint/no-non-null-assertion": 0
     }
   },
   "eslintIgnore": [
@@ -104,6 +108,6 @@
     "sinon": "^9.0.2",
     "sinon-chai": "^3.5.0",
     "ts-node": "^8.10.2",
-    "typescript": "^3.9.3"
+    "typescript": "^3.9.7"
   }
 }

@@ -80,9 +80,34 @@ emitter.off('foo', onFoo)  // unlisten
 
 ### Typescript
 
+Set `"strict": true` in your tsconfig.json to get improved type inference for `mitt` instance methods.
+
 ```ts
 import mitt from 'mitt';
-const emitter: mitt.Emitter = mitt();
+
+type Events = {
+  foo: string;
+  bar?: number;
+};
+
+const emitter = mitt<Events>(); // inferred as Emitter<Events>
+
+emitter.on('foo', (e) => {}); // 'e' has inferred type 'string'
+
+emitter.emit('foo', 42); // Error: Argument of type 'number' is not assignable to parameter of type 'string'. (2345)
+```
+
+Alternatively, you can use the provided `Emitter` type:
+
+```ts
+import mitt, { Emitter } from 'mitt';
+
+type Events = {
+  foo: string;
+  bar?: number;
+};
+
+const emitter: Emitter<Events> = mitt<Events>();
 ```
 
 ## Examples & Demos
@@ -126,25 +151,26 @@ Register an event handler for the given type.
 
 #### Parameters
 
--   `type` **([string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) \| [symbol](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Symbol))** Type of event to listen for, or `"*"` for all events
+-   `type` **([string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) \| [symbol](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Symbol))** Type of event to listen for, or `'*'` for all events
 -   `handler` **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)** Function to call in response to given event
 -   `readCache`   (optional, default `true`)
 
 ### off
 
 Remove an event handler for the given type.
+If `handler` is omitted, all handlers of the given type are removed.
 
 #### Parameters
 
--   `type` **([string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) \| [symbol](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Symbol))** Type of event to unregister `handler` from, or `"*"`
--   `handler` **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)** Handler function to remove
+-   `type` **([string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) \| [symbol](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Symbol))** Type of event to unregister `handler` from, or `'*'`
+-   `handler` **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)?** Handler function to remove
 
 ### emit
 
 Invoke all handlers for the given type.
-If present, `"*"` handlers are invoked after type-matched handlers.
+If present, `'*'` handlers are invoked after type-matched handlers.
 
-Note: Manually firing "\*" handlers is not supported.
+Note: Manually firing '\*' handlers is not supported.
 
 #### Parameters
 

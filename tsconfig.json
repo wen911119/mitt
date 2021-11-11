@@ -1,14 +1,12 @@
 {
 	"compileOnSave": false,
 	"compilerOptions": {
+		"strict": true,
 		"noEmit": true,
 		"declaration": true,
 		"moduleResolution": "node",
 		"esModuleInterop": true,
 		"lib": ["ES2015", "DOM"],
 	},
-	"include": [
-		"src/*.ts",
-		"test/*.ts",
-	]
+	"include": ["src/*.ts", "test/*.ts"]
 }

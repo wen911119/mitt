@@ -1,4 +1,4 @@
-import mitt, { Emitter } from '..';
+import mitt, { Emitter, EventHandlerMap } from '..';
 import chai, { expect } from 'chai';
 import { spy } from 'sinon';
 import sinonChai from 'sinon-chai';
@@ -15,7 +15,7 @@ describe('mitt', () => {
 		const a = spy();
 		const b = spy();
 		map.set('foo', [a, b]);
-		const events = mitt(map);
+		const events = mitt<{ foo: undefined }>(map);
 		events.emit('foo');
 		expect(a).to.have.been.calledOnce;
 		expect(b).to.have.been.calledOnce;
@@ -23,9 +23,21 @@ describe('mitt', () => {
 });
 
 describe('mitt#', () => {
-	let events, inst: Emitter;
+	const eventType = Symbol('eventType');
+	type Events = {
+		foo: unknown;
+		constructor: unknown;
+		FOO: unknown;
+		bar: unknown;
+		Bar: unknown;
+		'baz:bat!': unknown;
+		'baz:baT!': unknown;
+		Foo: unknown;
+		[eventType]: unknown;
+	};
+	let events: EventHandlerMap<Events>, inst: Emitter<Events>;
 
-	beforeEach( () => {
+	beforeEach(() => {
 		events = new Map();
 		inst = mitt(events);
 	});
@@ -83,7 +95,6 @@ describe('mitt#', () => {
 
 		it('can take symbols for event types', () => {
 			const foo = () => {};
-			const eventType = Symbol('eventType');
 			inst.on(eventType, foo);
 			expect(events.get(eventType)).to.deep.equal([foo]);
 		});
@@ -139,6 +150,17 @@ describe('mitt#', () => {
 			inst.off('foo', foo);
 			expect(events.get('foo')).to.deep.equal([]);
 		});
+
+		it('off("type") should remove all handlers of the given type', () => {
+			inst.on('foo', () => {});
+			inst.on('foo', () => {});
+			inst.on('bar', () => {});
+			inst.off('foo');
+			expect(events.get('foo')).to.deep.equal([]);
+			expect(events.get('bar')).to.have.length(1);
+			inst.off('bar');
+			expect(events.get('bar')).to.deep.equal([]);
+		});
 	});
 
 	describe('emit()', () => {
@@ -151,7 +173,7 @@ describe('mitt#', () => {
 		it('should invoke handler for type', () => {
 			const event = { a: 'b' };
 
-			inst.on('foo', (one, two?) => {
+			inst.on('foo', (one, two?: unknown) => {
 				expect(one).to.deep.equal(event);
 				expect(two).to.be.an('undefined');
 			});
